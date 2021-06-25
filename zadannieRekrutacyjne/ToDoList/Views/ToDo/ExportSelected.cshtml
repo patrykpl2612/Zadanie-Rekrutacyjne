@@ -1,0 +1,71 @@
+﻿@model IEnumerable<ToDoList.Models.TodoList>
+
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<p>
+    <a asp-action="Create">Add new ToDo item</a> | <a asp-action="ShowSpecific">Show specific item</a> | <a asp-action="Test">Export to PDF</a> | <a asp-action="ExportSelectedToPDF">Export selected to PDF</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Content
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.Id |
+                    @item.Content
+                </td>
+                <td>
+                    <input type="checkbox" id="@item.Id">
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<button onclick="SaveList()">Save List</button>
+
+<script>
+
+    var SaveList = function () {
+        var arrItem = [];
+        var commaSeperatedIds = "";
+
+        $("#ItemList li input[type=checkbox]").each(function (index, val){
+            var checkId = $(val).attr("Id");
+            var arr = checkId.split('_');
+            var currentCheckboxId = arr[1];
+            var IsChecked = $("#" + checkId).is(":checked", true);
+
+            if (IsChecked) {
+                arrItem.push(currentCheckboxId);
+            }
+        })
+
+        if (arrItem.length != 0) {
+            commaSeperatedIds = arrItem.toString();
+
+            $.ajax({
+                url:"/ToDo/ExportSelected",
+                type: "POST",
+                data: { ItemList: commaSeperatedIds },
+                success: function (response) {
+
+                }
+
+            })
+        }
+
+    }
+
+</script>
